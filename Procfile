@@ -1,1 +1,1 @@
-hubot: bin/hubot -a campfire -n Hubot
+hubot: bin/hubot -a hipchat -n Hubot
