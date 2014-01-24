@@ -23,6 +23,7 @@
 #   hubot add task <text>
 #   hubot ask <user name> to <text>
 #   hubot move <id> to <done|current|upcoming|shelf>
+#   hubot work on <id>
 #   hubot finish <id>
 #
 # Author:
@@ -105,6 +106,9 @@ module.exports = (robot) ->
 
   robot.respond /finish\s(task\s)?\#?(\d+)/i, (msg) ->
     moveIssue msg, msg.match[2], 'done'
+
+  robot.respond /work on\s(task\s)?\#?(\d+)/i, (msg) ->
+    moveIssue msg, msg.match[2], 'current'
 
   robot.respond /what am i working on\??/i, (msg) ->
     showIssues msg, msg.message.user.name, 'current'
