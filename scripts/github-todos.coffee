@@ -30,9 +30,9 @@
 # Author:
 #   adamjacobbecker
 
-# TODO:
+# Todo:
 #    what did [i|user] finish [in [period of time]]
-
+#    Automatic time tracking w/ comments
 
 _  = require("underscore")
 _s = require("underscore.string")
@@ -51,18 +51,28 @@ module.exports = (robot) ->
     log "Getting GitHub username for #{userName}"
     process.env["HUBOT_GITHUB_USER_#{userName.split(' ')[0].toUpperCase()}"]
 
+  getGithubToken = (userName) ->
+    log "Getting GitHub token for #{userName}"
+    process.env["HUBOT_GITHUB_USER_#{userName.split(' ')[0].toUpperCase()}_TOKEN"]
+
+  doubleUnquote = (x) ->
+    _s.unquote(_s.unquote(x), "'")
+
   addIssue = (msg, taskBody, userName, opts = {}) ->
     sendData =
-      title: _s.unquote(taskBody).replace(/\"/g, '').split('-')[0]
-      body: _s.unquote(taskBody).split('-')[1] || ''
+      title: doubleUnquote(taskBody).replace(/\"/g, '').split('-')[0]
+      body: doubleUnquote(taskBody).split('-')[1] || ''
       assignee: getGithubUser(userName)
       labels: [opts.label || 'upcoming']
 
-    if opts.footer
-      sendData.body += "\n\n(added by #{getGithubUser(msg.message.user.name) || 'unknown user'}. " +
-                       "remember, you'll need to bring them in with an @mention.)"
+    if (x = getGithubToken(msg.message.user.name))
+      sendData.token = x
 
-    log "Adding issue", sendData
+    else if opts.footer
+      sendData.body += "\n\n(added by #{getGithubUser(msg.message.user.name) || 'unknown user'}. " +
+                   "remember, you'll need to bring them in with an @mention.)"
+
+    log "Adding issue", _.omit(sendData, 'token')
 
     github.post "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues", sendData, (data) ->
       msg.send "Added issue ##{data.number}: #{data.html_url}"
@@ -86,21 +96,17 @@ module.exports = (robot) ->
     log "Showing issues", queryParams
 
     github.get "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues", queryParams, (data) ->
-      # if limit?
-      #   data = _.first data, limit
-
       if _.isEmpty data
           msg.send "No issues found."
       else
         for issue in data
           msg.send "##{issue.number} #{issue.title}: #{issue.html_url}"
 
-
   robot.respond /add task (.*)/i, (msg) ->
     addIssue msg, msg.match[1], msg.message.user.name
 
-  robot.respond /work on ([A-Z][\s\S\d]+)/i, (msg) ->
-    addIssue msg, msg.match[1], msg.message.user.name, label: 'current'
+  robot.respond /work on ([A-Z\'\"][\s\S\d]+)/i, (msg) ->
+    addIssue msg, msg.match[1], msg.message.user.name, label: 'current', footer: true
 
   robot.respond /ask (\S+) to (.*)/i, (msg) ->
     addIssue msg, msg.match[2], msg.match[1], footer: true
@@ -131,4 +137,3 @@ module.exports = (robot) ->
 
   robot.respond /what(\'s)?(\sis)? on (\S+) shelf\??/i, (msg) ->
     showIssues msg, msg.match[3].split('\'')[0], 'shelf'
-
