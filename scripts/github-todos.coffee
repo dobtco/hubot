@@ -14,25 +14,23 @@
 #   HUBOT_GITHUB_API
 #
 # Commands:
-#   what am i working on
-#   what's [user] working on
-#   what's next
-#   what's next for [user]
-#   what's on the shelf
-#   what's on [user]'s shelf
-
-#   what did [i|user] finish [in [period of time]]
-#
-#   add task [TASK TEXT] (split issue name/description with '-')
-#   ask [user] to [TASK TEXT]
-#   move [id] to [done|current|upcoming|shelf]
-#   finish [id]
-#
-# Notes:
-#
+#   hubot what am i working on
+#   hubot what's <chat user> working on
+#   hubot what's next
+#   hubot what's next for <chat user>
+#   hubot what's on my shelf
+#   hubot what's on <chat user>'s shelf
+#   hubot add task <text>
+#   hubot ask <user name> to <text>
+#   hubot move <id> to <done|current|upcoming|shelf>
+#   hubot finish <id>
 #
 # Author:
 #   adamjacobbecker
+
+# TODO:
+#    what did [i|user] finish [in [period of time]]
+
 
 _  = require("underscore")
 _s = require("underscore.string")
@@ -42,9 +40,13 @@ GITHUB_TODOS_REPO_NAME = 'dobt'
 
 module.exports = (robot) ->
 
+  log = (msgs...) ->
+    console.log(msgs)
+
   github = require("githubot")(robot)
 
   getGithubUser = (userName) ->
+    log "Getting GitHub username for #{userName}"
     process.env["HUBOT_GITHUB_USER_#{userName.toUpperCase()}"]
 
   addIssue = (msg, taskBody, userName, opts = {}) ->
@@ -58,6 +60,8 @@ module.exports = (robot) ->
       sendData.body += "\n\n(added by #{getGithubUser(msg.message.user.name) || 'unknown user'}. " +
                        "remember, you'll need to bring them in with an @mention.)"
 
+    log "Adding issue", sendData
+
     github.post "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues", sendData, (data) ->
       msg.send "Added issue ##{data.number}: #{data.html_url}"
 
@@ -66,13 +70,18 @@ module.exports = (robot) ->
       state: if newLabel == 'done' then 'closed' else 'open'
       labels: [newLabel.toLowerCase()]
 
+    log "Moving issue", sendData
+
     github.patch "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues/#{taskId}", sendData, (data) ->
       if _.find(data.labels, ((l) -> l.name.toLowerCase() == newLabel.toLowerCase()))
-        msg.send "Moved issue ##{data.number} to #{newLabel.toLowerCase()}"
+        msg.send "Moved issue ##{data.number} to #{newLabel.toLowerCase()}: #{data.html_url}"
 
   showIssues = (msg, userName, label) ->
     queryParams =
       assignee: getGithubUser(userName)
+      labels: label
+
+    log "Showing issues", queryParams
 
     github.get "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues", queryParams, (data) ->
       # if limit?
@@ -104,12 +113,12 @@ module.exports = (robot) ->
     showIssues msg, msg.match[3], 'current'
 
   robot.respond /what(\'s)?(\sis)? next for (\S+)\??/i, (msg) ->
-    showIssues msg, msg.match[3], 'upcoming'
+    showIssues msg, msg.match[3].replace('?', ''), 'upcoming'
 
-  robot.respond /what(\'s)?(\sis)? next\??/i, (msg) ->
+  robot.respond /what(\'s)?(\sis)? next\??(\s*)$/i, (msg) ->
     showIssues msg, msg.message.user.name, 'upcoming'
 
-  robot.respond /what(\'s)?(\sis)? on the shelf\??/i, (msg) ->
+  robot.respond /what(\'s)?(\sis)? on my shelf\??/i, (msg) ->
     showIssues msg, msg.message.user.name, 'shelf'
 
   robot.respond /what(\'s)?(\sis)? on (\S+) shelf\??/i, (msg) ->
