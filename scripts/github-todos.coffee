@@ -68,7 +68,7 @@ module.exports = (robot) ->
 
   moveIssue = (msg, taskId, newLabel, opts = {}) ->
     sendData =
-      state: if newLabel == 'done' then 'closed' else 'open'
+      state: if newLabel in ['done', 'trash'] then 'closed' else 'open'
       labels: [newLabel.toLowerCase()]
 
     log "Moving issue", sendData
