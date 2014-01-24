@@ -31,6 +31,9 @@
 #   adamjacobbecker
 
 # Todo:
+#    alternate syntaxes
+#    assign already-existing tasks
+#    use user's token when moving issues, too
 #    what did [i|user] finish [in [period of time]]
 #    Automatic time tracking w/ comments
 
