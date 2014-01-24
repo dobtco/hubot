@@ -47,7 +47,7 @@ module.exports = (robot) ->
 
   getGithubUser = (userName) ->
     log "Getting GitHub username for #{userName}"
-    process.env["HUBOT_GITHUB_USER_#{userName.toUpperCase()}"]
+    process.env["HUBOT_GITHUB_USER_#{userName.split(' ')[0].toUpperCase()}"]
 
   addIssue = (msg, taskBody, userName, opts = {}) ->
     sendData =
