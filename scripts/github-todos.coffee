@@ -52,7 +52,7 @@ module.exports = (robot) ->
   addIssue = (msg, taskBody, userName, opts = {}) ->
     sendData =
       title: _s.unquote(taskBody).replace(/\"/g, '').split('-')[0]
-      body: _s.unquote(taskBody).split('-')[1]
+      body: _s.unquote(taskBody).split('-')[1] || ''
       assignee: getGithubUser(userName)
       labels: [opts.label || 'upcoming']
 
