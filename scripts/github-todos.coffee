@@ -14,18 +14,18 @@
 #   HUBOT_GITHUB_API
 #
 # Commands:
-#   hubot what am i working on
-#   hubot what's <chat user> working on
-#   hubot what's next
-#   hubot what's next for <chat user>
-#   hubot what's on my shelf
-#   hubot what's on <chat user>'s shelf
-#   hubot add task <text>
-#   hubot ask <user name> to <text>
-#   hubot move <id> to <done|current|upcoming|shelf>
-#   hubot work on <text>
-#   hubot work on <id>
-#   hubot finish <id>
+#   hubot what am i working on #todos
+#   hubot what's <user> working on #todos
+#   hubot what's next #todos
+#   hubot what's next for <user> #todos
+#   hubot what's on my shelf #todos
+#   hubot what's on <user>'s shelf #todos
+#   hubot add task <text> #todos
+#   hubot ask <user> to <text> #todos
+#   hubot move <id> to <done|current|upcoming|shelf> #todos
+#   hubot work on <text> #todos
+#   hubot work on <id> #todos
+#   hubot finish <id> #todos
 #
 # Author:
 #   adamjacobbecker
