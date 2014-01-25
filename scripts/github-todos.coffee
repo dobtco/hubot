@@ -16,7 +16,10 @@
 # Commands:
 #   hubot add task <text> #todos
 #   hubot ask <user> to <text> #todos
+#   hubot assign <id> to <user> #todos
+#   hubot assign <user> to <id> #todos
 #   hubot finish <id> #todos
+#   hubot i'll work on <id> #todos
 #   hubot move <id> to <done|current|upcoming|shelf> #todos
 #   hubot what am i working on #todos
 #   hubot what's <user> working on #todos
@@ -31,8 +34,7 @@
 #   adamjacobbecker
 
 # Todo:
-#    alternate syntaxes
-#    assign already-existing tasks
+#    alternate syntaxes?
 #    what did [i|user] finish [in [period of time]]
 #    Automatic time tracking w/ comments
 
@@ -60,10 +62,10 @@ module.exports = (robot) ->
   doubleUnquote = (x) ->
     _s.unquote(_s.unquote(x), "'")
 
-  addIssue = (msg, taskBody, userName, opts = {}) ->
+  addIssue = (msg, issueBody, userName, opts = {}) ->
     sendData =
-      title: doubleUnquote(taskBody).replace(/\"/g, '').split('-')[0]
-      body: doubleUnquote(taskBody).split('-')[1] || ''
+      title: doubleUnquote(issueBody).replace(/\"/g, '').split('-')[0]
+      body: doubleUnquote(issueBody).split('-')[1] || ''
       assignee: getGithubUser(userName)
       labels: [opts.label || 'upcoming']
 
@@ -79,7 +81,7 @@ module.exports = (robot) ->
     github.post "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues", sendData, (data) ->
       msg.send "Added issue ##{data.number}: #{data.html_url}"
 
-  moveIssue = (msg, taskId, newLabel, opts = {}) ->
+  moveIssue = (msg, issueId, newLabel, opts = {}) ->
     sendData =
       state: if newLabel in ['done', 'trash'] then 'closed' else 'open'
       labels: [newLabel.toLowerCase()]
@@ -89,9 +91,21 @@ module.exports = (robot) ->
 
     log "Moving issue", _.omit(sendData, 'token')
 
-    github.patch "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues/#{taskId}", sendData, (data) ->
+    github.patch "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues/#{issueId}", sendData, (data) ->
       if _.find(data.labels, ((l) -> l.name.toLowerCase() == newLabel.toLowerCase()))
         msg.send "Moved issue ##{data.number} to #{newLabel.toLowerCase()}: #{data.html_url}"
+
+  assignIssue = (msg, issueId, userName, opts = {}) ->
+    sendData =
+      assignee: getGithubUser(userName)
+
+    if (x = getGithubToken(msg.message.user.name))
+      sendData.token = x
+
+    log "Assigning issue", _.omit(sendData, 'token')
+
+    github.patch "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues/#{issueId}", sendData, (data) ->
+      msg.send "Assigned issue ##{data.number} to #{data.assignee.login}: #{data.html_url}"
 
   showIssues = (msg, userName, label) ->
     queryParams =
@@ -142,3 +156,13 @@ module.exports = (robot) ->
 
   robot.respond /what(\'s)?(\sis)? on (\S+) shelf\??/i, (msg) ->
     showIssues msg, msg.match[3].split('\'')[0], 'shelf'
+
+  robot.respond /assign \#?(\d+) to (\S+)/i, (msg) ->
+    assignIssue msg, msg.match[1], msg.match[2]
+
+  robot.respond /assign (\S+) to \#?(\d+)/i, (msg) ->
+    assignIssue msg, msg.match[2], msg.match[1]
+
+  robot.respond /i\'ll work on \#?(\d+)/i, (msg) ->
+    assignIssue msg, msg.match[1], msg.message.user.name
+
