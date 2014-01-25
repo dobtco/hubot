@@ -33,7 +33,6 @@
 # Todo:
 #    alternate syntaxes
 #    assign already-existing tasks
-#    use user's token when moving issues, too
 #    what did [i|user] finish [in [period of time]]
 #    Automatic time tracking w/ comments
 
@@ -85,7 +84,10 @@ module.exports = (robot) ->
       state: if newLabel in ['done', 'trash'] then 'closed' else 'open'
       labels: [newLabel.toLowerCase()]
 
-    log "Moving issue", sendData
+    if (x = getGithubToken(msg.message.user.name))
+      sendData.token = x
+
+    log "Moving issue", _.omit(sendData, 'token')
 
     github.patch "repos/#{GITHUB_TODOS_REPO_USER}/#{GITHUB_TODOS_REPO_NAME}/issues/#{taskId}", sendData, (data) ->
       if _.find(data.labels, ((l) -> l.name.toLowerCase() == newLabel.toLowerCase()))
