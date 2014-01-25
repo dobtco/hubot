@@ -65,12 +65,19 @@ module.exports = (robot) ->
       text: doubleUnquote(opts.text)
       "profile_ids": (if opts.service == 'all' then _.uniq(_.values(PROFILES)) else [getServiceId(opts.service)])
 
+    if opts.immediate
+      opts.sendData.now = true
+
     log 'sendUpdate', opts
 
     request.post "#{API_ROOT}/updates/create.json?#{atp}", { form: opts.sendData }, (err, res, body) ->
       data = JSON.parse(body)
       msg.send 'Error' unless data.success
-      msg.send "Buffered to #{data.updates.length} account(s): \"#{data.updates[0].text}\""
+
+      if opts.sendData.now
+        msg.send "Posted to #{data.updates.length} account(s): \"#{data.updates[0].text}\""
+      else
+        msg.send "Buffered to #{data.updates.length} account(s): \"#{data.updates[0].text}\""
 
   listUpdates = (msg, opts = {}) ->
     opts = _.extend
