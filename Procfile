@@ -1,1 +1,1 @@
-hubot: bin/hubot -a hipchat -n Hubot
+hubot: bin/hubot -a hipchat -n Hubot --alias /
