@@ -2,8 +2,8 @@
 #   Manage todos using GitHub issues.
 #
 # Dependencies:
-#   "underscore": "1.3.3"
-#   "underscore.string": "2.1.1"
+#   "underscore"
+#   "underscore.string"
 #   "githubot": "0.4.0"
 #
 # Configuration:
