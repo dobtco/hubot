@@ -27,8 +27,8 @@
     "hubot":         ">= 2.6.0 < 3.0.0",
     "hubot-hipchat": "*",
     "hubot-scripts": ">= 2.5.0 < 3.0.0",
-    "hubot-github-todos": "*",
-    "hubot-buffer": "*"
+    "hubot-github-todos": "0.0.2",
+    "hubot-buffer": "0.0.2"
   },
 
   "engines": {
