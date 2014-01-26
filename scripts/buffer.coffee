@@ -2,11 +2,16 @@
 #   Hubot interface for Buffer.
 #
 # Dependencies:
-#   "underscore"
-#   "underscore.string"
+#   "underscore": "1.5.2"
+#   "underscore.string": "2.3.3"
+#   "request": "2.33.0"
 #
 # Configuration:
 #   HUBOT_BUFFER_TOKEN
+#   HUBOT_BUFFER_FACEBOOK
+#   HUBOT_BUFFER_LINKEDIN
+#   HUBOT_BUFFER_GOOGLE
+#   HUBOT_BUFFER_TWITTER
 #
 # Commands:
 #   hubot <service> buffer <text> #buffer
@@ -18,26 +23,27 @@
 #
 # Author:
 #   adamjacobbecker
-
-# Todo:
 #
 
 _ = require('underscore')
 _s = require('underscore.string')
 request = require('request')
 
-PROFILES =
-  'twitter': '518bd196e19492301400001b'
-  'facebook': '518bd1b1e19492581400001a'
-  'google': '52e3ed6d0a0e32687a0001bb'
-  'linkedin': '52e40810d35725656e000226'
+PROFILES = {}
 
-# Aliases
-PROFILES['gplus'] = PROFILES['google+'] = PROFILES['google']
-PROFILES['tweet'] = PROFILES['twitter']
-PROFILES['fb'] = PROFILES['facebook']
+profile_types = {
+  'FACEBOOK': ['FB'],
+  'TWITTER': ['TWEET'],
+  'GOOGLE': ['GPLUS', 'GOOGLE+'],
+  'LINKEDIN': []
+}
 
-SERVICES_REGEX = "(twitter|tweet|fb|facebook|google|linkedin|gplus|google\\+)"
+for k, v of profile_types
+  if process.env["HUBOT_BUFFER_#{k}"]
+    PROFILES[k] = process.env["HUBOT_BUFFER_#{k}"]
+    PROFILES[x] = PROFILES[k] for x in v
+
+SERVICES_REGEX = "(#{_.map(_.keys(PROFILES), ((k) -> k.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1")) ).join('|')})"
 
 API_ROOT = "https://api.bufferapp.com/1"
 
@@ -52,7 +58,7 @@ module.exports = (robot) ->
     _s.unquote(_s.unquote(x), "'")
 
   getServiceId = (x) ->
-    PROFILES[x.toLowerCase()]
+    PROFILES[x.toUpperCase()]
 
   sendUpdate = (msg, opts = {}) ->
     opts = _.extend
@@ -112,8 +118,8 @@ module.exports = (robot) ->
   robot.respond new RegExp("immediate #{SERVICES_REGEX} buffer (.*)", 'i'), (msg) ->
     sendUpdate msg, text: msg.match[2], service: msg.match[1], immediate: true
 
-  robot.respond new RegExp("show (me\s)?(my\s)?#{SERVICES_REGEX} buffer", 'i'), (msg) ->
+  robot.respond new RegExp("show (me\\s)?(my\\s)?#{SERVICES_REGEX} buffer", 'i'), (msg) ->
     listUpdates msg, service: msg.match[3]
 
-  robot.respond new RegExp("show (me\s)?(my\s)?sent #{SERVICES_REGEX} buffer", 'i'), (msg) ->
+  robot.respond new RegExp("show (me\\s)?(my\\s)?sent #{SERVICES_REGEX} buffer", 'i'), (msg) ->
     listUpdates msg, pendingOrSent: 'sent', service: msg.match[3]
