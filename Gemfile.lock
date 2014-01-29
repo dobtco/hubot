@@ -1,0 +1,9 @@
+GEM
+  specs:
+    ghi (0.9.0.20130504)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  ghi
