@@ -16,6 +16,7 @@ module.exports = (robot) ->
       msg.send(stdout)
       console.log(error) if error
 
+    exec "mkdir .git; touch .git/config"
     exec "git config github.user #{getName(msg)}", putter
     exec "git config ghi.token #{getToken(msg)}", putter
     exec "git config ghi.repo dobtco/#{msg.match[1]}",  putter
