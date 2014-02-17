@@ -23,7 +23,7 @@
     "hubot": ">= 2.6.0 < 3.0.0",
     "hubot-hipchat": "*",
     "hubot-scripts": ">= 2.5.0 < 3.0.0",
-    "hubot-github-todos": "0.0.5",
+    "hubot-github-todos": "0.0.6",
     "hubot-buffer": "0.0.4",
     "githubot": "~0.5.0"
   },
