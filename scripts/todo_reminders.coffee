@@ -1,5 +1,6 @@
 IMAGE_URL = "http://f.cl.ly/items/3q1M011Q072S461s3x46/Screenshot_3_20_13_1_48_PM.png"
 HUBOT_USER_ID = 542415
+ROOM_URL = "43925_hubot@conf.hipchat.com"
 
 request = require 'request'
 _ = require 'underscore'
@@ -21,16 +22,17 @@ module.exports = (robot) ->
         getGithubUser(user.mention_name)
 
       for key, user of availableUsers
-        github.get "repos/#{process.env['HUBOT_GITHUB_TODOS_REPO']}/issues",
-          assignee: getGithubUser(user.mention_name)
-          labels: 'current'
-        , (data) ->
-          if _.isEmpty data
-            robot.messageRoom 'Hubot', "No current issues found for @#{user.mention_name}."
-            robot.messageRoom 'Hubot', IMAGE_URL
-            console.log "#{user.mention_name} has no issues, ping is not OK!"
-          else
-            console.log "#{user.mention_name} has issues, ping is OK!"
+        do (key, user) ->
+          github.get "repos/#{process.env['HUBOT_GITHUB_TODOS_REPO']}/issues",
+            assignee: getGithubUser(user.mention_name)
+            labels: 'current'
+          , (data) ->
+            if _.isEmpty data
+              robot.messageRoom ROOM_URL, "No current issues found for @#{user.mention_name}."
+              robot.messageRoom ROOM_URL, IMAGE_URL
+              console.log "#{user.mention_name} has no issues, ping is not OK!"
+            else
+              console.log "#{user.mention_name} has issues, ping is OK!"
 
   ping()
   setInterval ping, 3600000
