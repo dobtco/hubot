@@ -25,7 +25,8 @@
     "hubot-scripts": ">= 2.5.0 < 3.0.0",
     "hubot-github-todos": "0.0.6",
     "hubot-buffer": "0.0.4",
-    "githubot": "~0.5.0"
+    "githubot": "~0.5.0",
+    "underscore": "~1.6.0"
   },
   "engines": {
     "node": ">= 0.8.x",
