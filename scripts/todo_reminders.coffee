@@ -28,6 +28,9 @@ module.exports = (robot) ->
           if _.isEmpty data
             robot.messageRoom 'Hubot', "No current issues found for @#{user.mention_name}."
             robot.messageRoom 'Hubot', IMAGE_URL
+            console.log "#{user.mention_name} has no issues, ping is not OK!"
+          else
+            console.log "#{user.mention_name} has issues, ping is OK!"
 
   ping()
   setInterval ping, 3600000
