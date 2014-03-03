@@ -31,8 +31,11 @@ module.exports = (robot) ->
               robot.messageRoom ROOM_URL, "No current issues found for @#{user.mention_name}."
               robot.messageRoom ROOM_URL, IMAGE_URL
               console.log "#{user.mention_name} has no issues, ping is not OK!"
+            else if data.length == 1
+              console.log "#{user.mention_name} has one current issue, ping is OK!"
             else
-              console.log "#{user.mention_name} has issues, ping is OK!"
+              robot.messageRoom ROOM_URL, "Wow, such multitask. @#{user.mention_name} has #{data.length} issues marked as 'current'!"
+              console.log "#{user.mention_name} has #{data.length} issues, ping is not OK!"
 
   ping()
   setInterval ping, 3600000
