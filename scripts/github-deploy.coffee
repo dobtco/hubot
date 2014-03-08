@@ -30,9 +30,15 @@ module.exports = (robot) ->
     , (data) ->
 
       msg.send "Pull request ##{data.number} created: #{data.html_url}"
-      msg.send "Merging..."
+      setTimeout ->
+        msg.send "Merging..."
 
-      github.withOptions(options).put "repos/dobtco/#{msg.match[1]}/pulls/#{data.number}/merge",
-        commit_message: 'Deploy to production'
-      , (mergeData) ->
-        msg.send "Successfully merged. Tests will run and this ref will be pushed to production."
+        setTimeout ->
+          github.withOptions(options).put "repos/dobtco/#{msg.match[1]}/pulls/#{data.number}/merge",
+            commit_message: 'Deploy to production'
+          , (mergeData) ->
+            msg.send "Successfully merged. Tests will run and this ref will be pushed to production."
+        , 1000
+
+      , 200
+
