@@ -4,6 +4,7 @@ ROOM_URL = "43925_hubot@conf.hipchat.com"
 
 request = require 'request'
 _ = require 'underscore'
+async = require 'async'
 
 module.exports = (robot) ->
 
@@ -21,21 +22,39 @@ module.exports = (robot) ->
         (user.status in ['available', 'away']) &&
         getGithubUser(user.mention_name)
 
-      for key, user of availableUsers
-        do (key, user) ->
-          github.get "repos/#{process.env['HUBOT_GITHUB_TODOS_REPO']}/issues",
-            assignee: getGithubUser(user.mention_name)
-            labels: 'current'
-          , (data) ->
-            if _.isEmpty data
+      showIssueFunctions = []
+
+      queryParams =
+        assignee: '*'
+        labels: 'current'
+
+      for repo in (process.env['HUBOT_GITHUB_TODOS_REPO'] || '').split(',')
+        do (repo) =>
+          showIssueFunctions.push( (cb) =>
+            github.get "repos/#{repo}/issues", queryParams, (data) ->
+              cb(null, data)
+          )
+
+      async.parallel showIssueFunctions, (err, results) =>
+        log("ERROR: #{err}") if err
+        allIssues = [].concat.apply([], results)
+
+        for key, user of availableUsers
+          do (key, user) ->
+            issueCount = _.filter(allIssues, (issue) ->
+              issue.assignee.login == getGithubUser(user.mention_name)
+            ).length
+
+            if issueCount == 0
               robot.messageRoom ROOM_URL, "No current issues found for @#{user.mention_name}."
               robot.messageRoom ROOM_URL, IMAGE_URL
               console.log "#{user.mention_name} has no issues, ping is not OK!"
-            else if data.length == 1
+            else if issueCount == 1
               console.log "#{user.mention_name} has one current issue, ping is OK!"
             else
-              robot.messageRoom ROOM_URL, "Wow, such multitask. @#{user.mention_name} has #{data.length} issues marked as 'current'!"
-              console.log "#{user.mention_name} has #{data.length} issues, ping is not OK!"
+              robot.messageRoom ROOM_URL, "http://cl.ly/image/0Z220V0O0i3j/jpeg.jpg"
+              robot.messageRoom ROOM_URL, "Wow, such multitask. @#{user.mention_name} has #{issueCount} issues marked as 'current'!"
+              console.log "#{user.mention_name} has #{issueCount} issues, ping is not OK!"
 
   ping()
   setInterval ping, 3600000
