@@ -18,6 +18,7 @@ module.exports = (robot) ->
       allUsers = JSON.parse(body)['users']
 
       availableUsers = _.filter allUsers, (user) ->
+        (user.mention_name != 'sid') &&
         (user.id != HUBOT_USER_ID) &&
         (user.status in ['available', 'away']) &&
         getGithubUser(user.mention_name)
