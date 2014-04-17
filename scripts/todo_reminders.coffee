@@ -7,6 +7,7 @@ _ = require 'underscore'
 async = require 'async'
 
 module.exports = (robot) ->
+  return
 
   github = require("githubot")(robot)
 
