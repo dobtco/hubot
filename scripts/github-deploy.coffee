@@ -24,9 +24,16 @@ module.exports = (robot) ->
     deployism = _.sample([
       'getting freaky'
       'taking the crazy train to deploy-town'
+      "deeeployin'"
+      'pushing out some hot new code'
+      ':ship:ing'
+      "gonna :shipit: like it's hot"
     ])
 
-    msg.send "Tonight we're #{deployism} at 10pm Eastern: #{robot.brain.data.deploys.join(', ') || 'n/a'}"
+    if robot.brain.data.deploys.length > 0
+      msg.send "Tonight we're #{deployism} at 10pm Eastern: #{robot.brain.data.deploys.join(', ')}"
+    else
+      msg.send "No deploys scheduled for tonight"
 
   log = (msgs...) ->
     console.log(msgs)
