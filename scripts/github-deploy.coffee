@@ -26,7 +26,7 @@ module.exports = (robot) ->
       'taking the crazy train to deploy-town'
     ])
 
-    msg.send "Tonight we're #{deployism}: #{robot.brain.data.deploys.join(', ') || 'n/a'}"
+    msg.send "Tonight we're #{deployism} at 10pm Eastern: #{robot.brain.data.deploys.join(', ') || 'n/a'}"
 
   log = (msgs...) ->
     console.log(msgs)
