@@ -10,8 +10,6 @@ require 'time'
 
 module.exports = (robot) ->
 
-  robot.messageRoom '#dev', 'test test'
-
   robot.brain.data.deploys ||= []
   github = require("githubot")(robot)
 
