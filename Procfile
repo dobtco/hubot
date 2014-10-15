@@ -1,1 +1,1 @@
-web: bin/hubot --adapter irc --alias //
+hubot: bin/hubot --adapter irc --alias //
