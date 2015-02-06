@@ -19,17 +19,18 @@
     "url": "https://github.com/github/hubot.git"
   },
   "dependencies": {
-    "hubot": ">= 2.7.2 < 3.0.0",
-    "hubot-scripts": ">= 2.5.11 < 3.0.0",
-    "hubot-github-todos": "0.3.2",
-    "hubot-buffer": "0.0.4",
-    "githubot": "~0.5.0",
-    "underscore": "~1.6.0",
-    "request": "~2.34.0",
     "async": "^0.6.2",
     "cron": "^1.0.4",
+    "githubot": "~0.5.0",
+    "hubot": ">= 2.7.2 < 3.0.0",
+    "hubot-buffer": "0.0.4",
+    "hubot-github-todos": "0.3.2",
+    "hubot-irc": "^0.2.7",
+    "hubot-scripts": ">= 2.5.11 < 3.0.0",
+    "nightmare": "^1.7.0",
+    "request": "~2.34.0",
     "time": "^0.10.0",
-    "hubot-irc": "^0.2.7"
+    "underscore": "~1.6.0"
   },
   "engines": {
     "node": ">= 0.8.x",
