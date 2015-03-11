@@ -11,7 +11,7 @@ require 'time'
 module.exports = (robot) ->
 
   robot.brain.data.deploys ||= []
-  github = require("githubot")(robot)
+  github = require("githubot")
 
   addDeploy = (repoName) ->
     robot.brain.data.deploys.push(repoName)
@@ -48,11 +48,12 @@ module.exports = (robot) ->
     if msg.message && (x = getGithubToken(msg.message.user.name))
       options.token = x
 
-    github.handleErrors (response) ->
-      msg.send response.error
-      msg.send response.body
+    client = github(robot, options)
 
-    github.withOptions(options).post "repos/dobtco/#{repoName}/pulls",
+    client.handleErrors (response) ->
+      msg.send "An error occurred: #{response.error}"
+
+    client.post "repos/dobtco/#{repoName}/pulls",
       title: 'Deploy to production'
       head: 'master'
       base: 'production'
@@ -63,7 +64,7 @@ module.exports = (robot) ->
         msg.send "Merging..."
 
         setTimeout ->
-          github.withOptions(options).put "repos/dobtco/#{repoName}/pulls/#{data.number}/merge",
+          client.put "repos/dobtco/#{repoName}/pulls/#{data.number}/merge",
             commit_message: 'Deploy to production'
           , (mergeData) ->
             msg.send "Successfully merged. Tests will run and this ref will be pushed to production."
