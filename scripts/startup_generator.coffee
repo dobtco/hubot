@@ -179,5 +179,5 @@ module.exports = (robot) ->
         request url, (_err, _res, _body) ->
           setTimeout ->
             msg.send "Introducing... #{name}.\n#{url}"
-          , 100
+          , 1000
       , 4000 # for first screenshot to complete
