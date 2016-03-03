@@ -176,5 +176,8 @@ module.exports = (robot) ->
       id = JSON.parse(body).id
       setTimeout ->
         url = "https://api.browshot.com/api/v1/screenshot/thumbnail?id=#{id}&key=#{apiKey}&left=#{x_coord}&right=#{x_coord + 300}&top=#{y_coord}&bottom=#{y_coord + 200}&width=300&height=200"
-        msg.send "Introducing... #{name}.\n#{url}"
+        request url, (_err, _res, _body) ->
+          setTimeout ->
+            msg.send "Introducing... #{name}.\n#{url}"
+          , 100
       , 4000 # for first screenshot to complete
