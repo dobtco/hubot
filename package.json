@@ -28,6 +28,7 @@
     "hubot-github-todos": "0.4.0",
     "hubot-irc": "^0.2.7",
     "hubot-scripts": "2.5.11",
+    "imgur": "^0.1.7",
     "nightmare": "^1.7.0",
     "prettyjson": "^1.1.3",
     "request": "~2.34.0",
