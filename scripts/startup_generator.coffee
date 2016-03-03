@@ -47,7 +47,7 @@ fs = require('fs')
 
 module.exports = (robot) ->
   robot.hear /startup me/i, (msg) ->
-    x_coord = _.sample([25, 370])
+    x_coord = _.sample([25, 370, 720])
     y_coord = _.sample([133, 363])
     thing = _.sample([
       "shirt",
