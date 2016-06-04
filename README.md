@@ -58,9 +58,6 @@ can be something like Campfire or IRC. There are a number of third party
 adapters that the community have contributed. Check
 [Hubot Adapters][hubot-adapters] for the available ones.
 
-We're using the IRC adapter to connect Hubot to Slack. The login details
-are in Meldium.
-
 If you would like to run a non-Campfire or shell adapter you will need to add
 the adapter package as a dependency to the `package.json` file in the
 `dependencies` section.

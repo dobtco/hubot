@@ -1,1 +1,1 @@
-hubot: bin/hubot --adapter irc --alias //
+hubot: bin/hubot --adapter slack --alias //
