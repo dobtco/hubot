@@ -4,8 +4,9 @@
 #
 # Commands:
 #   hubot location at our Oakland HQ #teamfinder
-#   hubot where is everyone?
-#   hubot where is <user>?
+#   hubot where is everyone? #teamfinder
+#   hubot where is <user>? #teamfinder
+#   hubot where am i? #teamfinder
 #
 # License:
 #   MIT
@@ -28,9 +29,9 @@ for k, v of process.env
   if (x = k.match(/^HUBOT_GITHUB_USER_(\S+)$/)?[1])
     githubUsers[x] = v unless x.match(/hubot/i) or x.match(/token/i) or (v in _.values(githubUsers))
 
-locationText = (userName, jsonBody) ->
+locationText = (userName, jsonBody, isYou = false) ->
   if jsonBody
-    "#{userName} is #{jsonBody.location.name || 'in an unknown location'} (Updated #{jsonBody.time_ago} ago)"
+    "#{userName} #{if isYou then 'are' else 'is'} #{jsonBody.location.name || 'in an unknown location'} (Updated #{jsonBody.time_ago} ago)"
 
 module.exports = (robot) ->
   locKey = (user, locId) ->
@@ -78,6 +79,17 @@ module.exports = (robot) ->
         msg.send(locText)
       else
         msg.send "Can't find #{msg.match[1]}."
+
+  robot.respond /where am i/i, (msg) ->
+    ghUser = getGithubUser(msg.message.user.name)
+    request { url: baseUrl + 'status', qs: tokenQuery }, (err, res, body) ->
+      if res.statusCode != 200
+        return msg.send("Error: #{body}")
+
+      if (locText = locationText('You', JSON.parse(body)[ghUser], true))
+        msg.send(locText)
+      else
+        msg.send "Can't find you."
 
   robot.respond /where is everyone/i, (msg) ->
     request { url: baseUrl + 'status', qs: tokenQuery }, (err, res, body) ->
