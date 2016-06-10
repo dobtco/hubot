@@ -44,15 +44,21 @@ module.exports = (robot) ->
     robot.brain.data.teamfinderAsks || = {}
     robot.brain.data.teamfinderAsks[locKey(user, locId)] = true
 
+  locationIsPrivate = (locId) ->
+    !!robot.brain.data.teamfinderAsks?[locKey('private', locId)]
+
+  trackPrivate = (locId) ->
+    robot.brain.data.teamfinderAsks || = {}
+    robot.brain.data.teamfinderAsks[locKey('private', locId)] = true
+
   checkForUnknownLocations = ->
     request { url: baseUrl + 'status', qs: tokenQuery }, (err, res, body) ->
       locs = JSON.parse(body)
       for k, v of locs
-        unless v.location.name || alreadyAskedAboutLocation(k, v.location.id)
-          console.log 'messageroom', nameFromGhUser(k).toLowerCase()
+        unless v.location.name || alreadyAskedAboutLocation(k, v.location.id) || locationIsPrivate(v.location.id)
           robot.messageRoom(
             nameFromGhUser(k).toLowerCase(),
-            "You're currently in an unknown location.\n(Say \"location at the Oakland HQ\" to set your location name)"
+            "You're currently in an unknown location.\n(Say \"location at the Oakland HQ\" to set your location name, or \"private location\" to prevent Hubot from asking others.)"
           )
 
           trackAsk(k, v.location.id)
@@ -101,6 +107,20 @@ module.exports = (robot) ->
         locText.push locationText(k, v)
 
       msg.send(locText.join("\n"))
+
+  robot.respond /private location/i, (msg) ->
+    ghUser = getGithubUser(msg.message.user.name)
+    request { url: baseUrl + 'status', qs: tokenQuery }, (err, res, body) ->
+      if res.statusCode != 200
+        return msg.send("Error: #{body}")
+
+      status = JSON.parse(body)[ghUser]
+
+      if status.location?.id
+        trackPrivate(status.location.id)
+        msg.send("Marked location as private.")
+      else
+        msg.send "Can't find you."
 
   robot.respond /location (.*)/i, (msg) ->
     request {
