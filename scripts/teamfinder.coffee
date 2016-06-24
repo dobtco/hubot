@@ -56,10 +56,11 @@ module.exports = (robot) ->
       locs = JSON.parse(body)
       for k, v of locs
         unless v.location.name || alreadyAskedAboutLocation(k, v.location.id) || locationIsPrivate(v.location.id)
-          robot.messageRoom(
-            nameFromGhUser(k).toLowerCase(),
-            "You're currently in an unknown location.\n(Say \"location at the Oakland HQ\" to set your location name, or \"private location\" to prevent Hubot from asking others.)"
-          )
+          if nameFromGhUser(k)
+            robot.messageRoom(
+              nameFromGhUser(k).toLowerCase(),
+              "You're currently in an unknown location.\n(Say \"location at the Oakland HQ\" to set your location name, or \"private location\" to prevent Hubot from asking others.)"
+            )
 
           trackAsk(k, v.location.id)
 
