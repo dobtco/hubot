@@ -28,7 +28,7 @@
     "hubot-github-todos": "0.4.0",
     "hubot-help": "^0.2.0",
     "hubot-scripts": "2.5.11",
-    "hubot-slack": "^3.4.2",
+    "hubot-slack": "^4.0.2",
     "moment": "^2.13.0",
     "nightmare": "^1.7.0",
     "prettyjson": "^1.1.3",
