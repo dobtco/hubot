@@ -23,7 +23,6 @@
     "cron": "^1.0.4",
     "githubot": "~1.0.0",
     "hubot": ">= 2.7.2 < 3.0.0",
-    "hubot-buffer": "0.0.4",
     "hubot-schedule": "^0.5.0",
     "hubot-github-todos": "1.0.0",
     "hubot-help": "^0.2.0",
