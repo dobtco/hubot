@@ -13,6 +13,9 @@ module.exports = (robot) ->
   robot.brain.data.deploys ||= []
   github = require("githubot")
 
+  github.handleErrors (response) ->
+    msg.send "An error occurred: #{response.statusCode} | #{response.error} | #{response.body}"
+
   addDeploy = (repoName) ->
     robot.brain.data.deploys.push(repoName)
     robot.brain.data.deploys = _.uniq(robot.brain.data.deploys)
@@ -49,9 +52,6 @@ module.exports = (robot) ->
       options.token = x
 
     client = github(robot, options)
-
-    client.handleErrors (response) ->
-      msg.send "An error occurred: #{response.error}"
 
     client.post "repos/dobtco/#{repoName}/pulls",
       title: 'Deploy to production'
