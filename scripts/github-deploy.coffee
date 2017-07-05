@@ -47,11 +47,15 @@ module.exports = (robot) ->
 
     if msg.message && (x = getGithubToken(msg.message.user.name))
       options.token = x
+    else
+      msg.send "Couldn't find GitHub token for #{msg.message.user.name}.\n \
+        Is #{"HUBOT_GITHUB_USER_#{msg.message.user.name.split(' ')[0].toUpperCase()}_TOKEN"} set?"
+      return
 
     client = github(robot, options)
 
     client.handleErrors (response) ->
-      msg.send "An error occurred: #{response.error}"
+      msg.send "An error occurred: #{response.error}. Raw response:\n>#{response.body}"
 
     client.post "repos/dobtco/#{repoName}/pulls",
       title: 'Deploy to production'
